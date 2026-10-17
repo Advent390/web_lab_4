@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 6.2023 Resource Definitions//EN" " ">
+<!-- Змініть User/Password/DatabaseName під свій PostgreSQL-сервер -->
+<resources>
+    <jdbc-connection-pool name="carspool"
+                          datasource-classname="org.postgresql.ds.PGSimpleDataSource"
+                          res-type="javax.sql.DataSource">
+        <property name="ServerName" value="localhost"/>
+        <property name="PortNumber" value="5432"/>
+        <property name="DatabaseName" value="web_lab_4"/>
+        <property name="User" value="postgres"/>
+        <property name="Password" value="1234"/>
+    </jdbc-connection-pool>
+    <jdbc-resource enabled="true" jndi-name="java:app/jdbc/nuos" object-type="user" pool-name="carspool"/>
+</resources>

@@ -1,0 +1,10 @@
+body { margin: 0; background: #f5f6f8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1f2937; }
+.topnav { display: flex; gap: 24px; align-items: center; padding: 12px 32px; background: #1f2937; }
+.topnav .brand { color: #fff; font-weight: 700; font-size: 1.1rem; margin-right: 16px; }
+.topnav a { color: #d1d5db; text-decoration: none; }
+.topnav a:hover { color: #fff; }
+.container { max-width: 1200px; margin: 24px auto; padding: 0 24px; }
+.section-head { display: flex; justify-content: space-between; align-items: center; }
+.form-grid { min-width: 320px; row-gap: 6px; }
+.form-grid .ui-inputtext, .form-grid .ui-selectonemenu { width: 100%; box-sizing: border-box; }
+.filter-grid td { padding: 4px 10px; }

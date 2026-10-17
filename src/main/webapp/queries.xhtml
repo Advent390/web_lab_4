@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+<f:view encoding="UTF-8">
+    <h:head>
+        <title>Автомобілі — запити</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        <ui:include src="/WEB-INF/templates-nav.xhtml"/>
+        <p:growl id="growl" showDetail="true" life="4000"/>
+
+        <div class="container">
+            <h1>Запити до бази даних</h1>
+
+            <h:form id="form-query">
+                <p:panel header="Пошук автомобілів за умовами (заповніть потрібні поля)">
+                    <h:panelGrid columns="4" cellpadding="6" styleClass="filter-grid">
+                        <h:outputLabel value="Модель містить" for="model"/>
+                        <p:inputText id="model" value="#{queryBean.model}"/>
+
+                        <h:outputLabel value="Виробник" for="mf"/>
+                        <p:selectOneMenu id="mf" value="#{queryBean.manufacturerId}">
+                            <f:selectItem itemLabel="Усі" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{manufacturerBean.manufacturers}" var="m"
+                                           itemLabel="#{m.name}" itemValue="#{m.id}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputLabel value="Рік від" for="yf"/>
+                        <p:inputText id="yf" value="#{queryBean.yearFrom}"/>
+
+                        <h:outputLabel value="Рік до" for="yt"/>
+                        <p:inputText id="yt" value="#{queryBean.yearTo}"/>
+
+                        <h:outputLabel value="Ціна від, $" for="pf"/>
+                        <p:inputText id="pf" value="#{queryBean.priceFrom}"/>
+
+                        <h:outputLabel value="Ціна до, $" for="pt"/>
+                        <p:inputText id="pt" value="#{queryBean.priceTo}"/>
+
+                        <h:outputLabel value="Паливо" for="fuel"/>
+                        <p:selectOneMenu id="fuel" value="#{queryBean.fuelType}">
+                            <f:selectItem itemLabel="Будь-яке" itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{queryBean.fuelTypes}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputLabel value="Пробіг до, км" for="mil"/>
+                        <p:inputText id="mil" value="#{queryBean.maxMileage}"/>
+                    </h:panelGrid>
+
+                    <p:commandButton value="Знайти" icon="pi pi-search" action="#{queryBean.search()}"
+                                     update="form-query, growl" style="margin-right:6px"/>
+                    <p:commandButton value="Скинути" icon="pi pi-times" styleClass="ui-button-flat"
+                                     action="#{queryBean.resetFilters()}" update="form-query, growl" process="@this"/>
+                </p:panel>
+
+                <p:panel header="Готові запити" style="margin-top:14px">
+                    <p:commandButton value="5 найдорожчих" action="#{queryBean.top5()}"
+                                     update="form-query, growl" process="@this" style="margin-right:6px"/>
+                    <p:commandButton value="Дорожчі за середню ціну" action="#{queryBean.aboveAverage()}"
+                                     update="form-query, growl" process="@this" style="margin-right:6px"/>
+                    <p:commandButton value="Статистика по виробниках" action="#{queryBean.stats()}"
+                                     update="form-query, growl" process="@this"/>
+                </p:panel>
+
+                <h2 style="margin-top:20px">
+                    <h:outputText value="#{queryBean.resultTitle}" rendered="#{queryBean.resultTitle != null}"/>
+                </h2>
+
+                <p:dataTable value="#{queryBean.carResults}" var="c" rendered="#{queryBean.carResults != null}"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             emptyMessage="Нічого не знайдено">
+                    <p:column headerText="ID"><h:outputText value="#{c.id}"/></p:column>
+                    <p:column headerText="Виробник" sortBy="#{c.manufacturerName}"><h:outputText value="#{c.manufacturerName}"/></p:column>
+                    <p:column headerText="Модель" sortBy="#{c.model}"><h:outputText value="#{c.model}"/></p:column>
+                    <p:column headerText="Рік" sortBy="#{c.productionYear}"><h:outputText value="#{c.productionYear}"/></p:column>
+                    <p:column headerText="Ціна, $" sortBy="#{c.price}">
+                        <h:outputText value="#{c.price}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="Пробіг, км" sortBy="#{c.mileage}">
+                        <h:outputText value="#{c.mileage}"><f:convertNumber pattern="#,##0"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="Колір"><h:outputText value="#{c.color}"/></p:column>
+                    <p:column headerText="Паливо"><h:outputText value="#{c.fuelType}"/></p:column>
+                </p:dataTable>
+
+                <p:dataTable value="#{queryBean.statsResults}" var="r" rendered="#{queryBean.statsResults != null}"
+                             emptyMessage="Даних немає">
+                    <p:column headerText="Виробник"><h:outputText value="#{r.manufacturer}"/></p:column>
+                    <p:column headerText="Кількість авто"><h:outputText value="#{r.carCount}"/></p:column>
+                    <p:column headerText="Середня ціна, $">
+                        <h:outputText value="#{r.avgPrice}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="Мін. ціна, $">
+                        <h:outputText value="#{r.minPrice}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="Макс. ціна, $">
+                        <h:outputText value="#{r.maxPrice}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </div>
+    </h:body>
+</f:view>
+</html>

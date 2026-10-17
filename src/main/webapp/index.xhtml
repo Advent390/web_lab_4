@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="uk"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+<f:view encoding="UTF-8">
+    <h:head>
+        <title>Автомобілі — CRUD</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        <ui:include src="/WEB-INF/templates-nav.xhtml"/>
+        <p:growl id="growl" showDetail="true" life="4000"/>
+
+        <!-- ================= ДІАЛОГИ: АВТОМОБІЛІ ================= -->
+        <p:dialog id="dialog-create-car" header="Додати автомобіль" widgetVar="dlgCreateCar"
+                  showEffect="fade" closeOnEscape="true" modal="true" dismissibleMask="true">
+            <h:form id="form-create-car">
+                <h:panelGrid columns="1" styleClass="form-grid">
+                    <h:outputLabel value="Виробник" for="mf"/>
+                    <p:selectOneMenu id="mf" value="#{carBean.car.manufacturerId}">
+                        <f:selectItem itemLabel="Оберіть виробника" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{manufacturerBean.manufacturers}" var="m"
+                                       itemLabel="#{m.name}" itemValue="#{m.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputLabel value="Модель" for="model"/>
+                    <p:inputText id="model" value="#{carBean.car.model}"/>
+
+                    <h:outputLabel value="Рік випуску" for="year"/>
+                    <p:inputText id="year" value="#{carBean.car.productionYear}"/>
+
+                    <h:outputLabel value="Ціна, $" for="price"/>
+                    <p:inputText id="price" value="#{carBean.car.price}"/>
+
+                    <h:outputLabel value="Пробіг, км" for="mileage"/>
+                    <p:inputText id="mileage" value="#{carBean.car.mileage}"/>
+
+                    <h:outputLabel value="Колір" for="color"/>
+                    <p:inputText id="color" value="#{carBean.car.color}"/>
+
+                    <h:outputLabel value="Паливо" for="fuel"/>
+                    <p:selectOneMenu id="fuel" value="#{carBean.car.fuelType}">
+                        <f:selectItem itemLabel="—" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{carBean.fuelTypes}"/>
+                    </p:selectOneMenu>
+
+                    <p:commandButton value="Додати" action="#{carBean.create()}"
+                                     update="@form, form-cars, growl"
+                                     oncomplete="if (args.ok) PF('dlgCreateCar').hide()"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dialog-update-car" header="Редагувати автомобіль" widgetVar="dlgUpdateCar"
+                  showEffect="fade" closeOnEscape="true" modal="true" dismissibleMask="true">
+            <h:form id="form-update-car">
+                <h:panelGrid columns="1" styleClass="form-grid">
+                    <h:outputLabel value="ID" for="id"/>
+                    <p:inputText id="id" value="#{carBean.updateCar.id}" readonly="true"/>
+
+                    <h:outputLabel value="Виробник" for="mf"/>
+                    <p:selectOneMenu id="mf" value="#{carBean.updateCar.manufacturerId}">
+                        <f:selectItems value="#{manufacturerBean.manufacturers}" var="m"
+                                       itemLabel="#{m.name}" itemValue="#{m.id}"/>
+                    </p:selectOneMenu>
+
+                    <h:outputLabel value="Модель" for="model"/>
+                    <p:inputText id="model" value="#{carBean.updateCar.model}"/>
+
+                    <h:outputLabel value="Рік випуску" for="year"/>
+                    <p:inputText id="year" value="#{carBean.updateCar.productionYear}"/>
+
+                    <h:outputLabel value="Ціна, $" for="price"/>
+                    <p:inputText id="price" value="#{carBean.updateCar.price}"/>
+
+                    <h:outputLabel value="Пробіг, км" for="mileage"/>
+                    <p:inputText id="mileage" value="#{carBean.updateCar.mileage}"/>
+
+                    <h:outputLabel value="Колір" for="color"/>
+                    <p:inputText id="color" value="#{carBean.updateCar.color}"/>
+
+                    <h:outputLabel value="Паливо" for="fuel"/>
+                    <p:selectOneMenu id="fuel" value="#{carBean.updateCar.fuelType}">
+                        <f:selectItem itemLabel="—" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{carBean.fuelTypes}"/>
+                    </p:selectOneMenu>
+
+                    <p:commandButton value="Зберегти" action="#{carBean.update()}"
+                                     update="form-cars, growl"
+                                     oncomplete="if (args.ok) PF('dlgUpdateCar').hide()"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <!-- ================= ДІАЛОГИ: ВИРОБНИКИ ================= -->
+        <p:dialog id="dialog-create-mf" header="Додати виробника" widgetVar="dlgCreateMf"
+                  showEffect="fade" closeOnEscape="true" modal="true" dismissibleMask="true">
+            <h:form id="form-create-mf">
+                <h:panelGrid columns="1" styleClass="form-grid">
+                    <h:outputLabel value="Назва" for="name"/>
+                    <p:inputText id="name" value="#{manufacturerBean.manufacturer.name}"/>
+
+                    <h:outputLabel value="Країна" for="country"/>
+                    <p:inputText id="country" value="#{manufacturerBean.manufacturer.country}"/>
+
+                    <h:outputLabel value="Рік заснування" for="founded"/>
+                    <p:inputText id="founded" value="#{manufacturerBean.manufacturer.foundedYear}"/>
+
+                    <h:outputLabel value="Опис" for="descr"/>
+                    <p:inputTextarea id="descr" rows="3" value="#{manufacturerBean.manufacturer.description}"/>
+
+                    <p:commandButton value="Додати" action="#{manufacturerBean.create()}"
+                                     update="@form, form-manufacturers, form-create-car, form-update-car, growl"
+                                     oncomplete="if (args.ok) PF('dlgCreateMf').hide()"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="dialog-update-mf" header="Редагувати виробника" widgetVar="dlgUpdateMf"
+                  showEffect="fade" closeOnEscape="true" modal="true" dismissibleMask="true">
+            <h:form id="form-update-mf">
+                <h:panelGrid columns="1" styleClass="form-grid">
+                    <h:outputLabel value="ID" for="id"/>
+                    <p:inputText id="id" value="#{manufacturerBean.updateManufacturer.id}" readonly="true"/>
+
+                    <h:outputLabel value="Назва" for="name"/>
+                    <p:inputText id="name" value="#{manufacturerBean.updateManufacturer.name}"/>
+
+                    <h:outputLabel value="Країна" for="country"/>
+                    <p:inputText id="country" value="#{manufacturerBean.updateManufacturer.country}"/>
+
+                    <h:outputLabel value="Рік заснування" for="founded"/>
+                    <p:inputText id="founded" value="#{manufacturerBean.updateManufacturer.foundedYear}"/>
+
+                    <h:outputLabel value="Опис" for="descr"/>
+                    <p:inputTextarea id="descr" rows="3" value="#{manufacturerBean.updateManufacturer.description}"/>
+
+                    <p:commandButton value="Зберегти" action="#{manufacturerBean.update()}"
+                                     update="form-manufacturers, form-cars, form-create-car, form-update-car, growl"
+                                     oncomplete="if (args.ok) PF('dlgUpdateMf').hide()"/>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <!-- ================= ТАБЛИЦЯ: АВТОМОБІЛІ ================= -->
+        <div class="container">
+            <div class="section-head">
+                <h1>Автомобілі</h1>
+                <h:form>
+                    <p:commandButton type="button" value="Додати автомобіль" onclick="PF('dlgCreateCar').show()"/>
+                </h:form>
+            </div>
+            <h:form id="form-cars">
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                    <p:commandButton value="Ні" type="button" styleClass="ui-confirmdialog-no ui-button-flat"
+                                     icon="pi pi-times"/>
+                    <p:commandButton value="Так" type="button" styleClass="ui-confirmdialog-yes ui-button-danger"
+                                     icon="pi pi-check"/>
+                </p:confirmDialog>
+                <p:dataTable id="car-table" value="#{carBean.cars}" var="c"
+                             paginator="true" paginatorPosition="bottom" rows="8"
+                             emptyMessage="Автомобілів ще немає">
+                    <p:column headerText="ID" sortBy="#{c.id}" width="50"><h:outputText value="#{c.id}"/></p:column>
+                    <p:column headerText="Виробник" sortBy="#{c.manufacturerName}"><h:outputText value="#{c.manufacturerName}"/></p:column>
+                    <p:column headerText="Модель" sortBy="#{c.model}"><h:outputText value="#{c.model}"/></p:column>
+                    <p:column headerText="Рік" sortBy="#{c.productionYear}"><h:outputText value="#{c.productionYear}"/></p:column>
+                    <p:column headerText="Ціна, $" sortBy="#{c.price}">
+                        <h:outputText value="#{c.price}"><f:convertNumber pattern="#,##0.00"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="Пробіг, км" sortBy="#{c.mileage}">
+                        <h:outputText value="#{c.mileage}"><f:convertNumber pattern="#,##0"/></h:outputText>
+                    </p:column>
+                    <p:column headerText="Колір"><h:outputText value="#{c.color}"/></p:column>
+                    <p:column headerText="Паливо"><h:outputText value="#{c.fuelType}"/></p:column>
+                    <p:column headerText="Дії" width="130">
+                        <p:commandButton icon="pi pi-pencil" styleClass="ui-button-secondary" style="margin-right:5px"
+                                         action="#{carBean.selectForUpdate(c.id)}"
+                                         update="form-update-car, growl"
+                                         oncomplete="PF('dlgUpdateCar').show()"/>
+                        <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger"
+                                         action="#{carBean.delete(c.id)}"
+                                         update="form-cars, growl">
+                            <p:confirm header="Видалення" icon="pi pi-exclamation-triangle"
+                                       message="Видалити цей автомобіль?"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </div>
+
+        <!-- ================= ТАБЛИЦЯ: ВИРОБНИКИ ================= -->
+        <div class="container">
+            <div class="section-head">
+                <h1>Виробники</h1>
+                <h:form>
+                    <p:commandButton type="button" value="Додати виробника" onclick="PF('dlgCreateMf').show()"/>
+                </h:form>
+            </div>
+            <h:form id="form-manufacturers">
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                    <p:commandButton value="Ні" type="button" styleClass="ui-confirmdialog-no ui-button-flat"
+                                     icon="pi pi-times"/>
+                    <p:commandButton value="Так" type="button" styleClass="ui-confirmdialog-yes ui-button-danger"
+                                     icon="pi pi-check"/>
+                </p:confirmDialog>
+                <p:dataTable id="mf-table" value="#{manufacturerBean.manufacturers}" var="m"
+                             paginator="true" paginatorPosition="bottom" rows="6"
+                             emptyMessage="Виробників ще немає">
+                    <p:column headerText="ID" sortBy="#{m.id}" width="50"><h:outputText value="#{m.id}"/></p:column>
+                    <p:column headerText="Назва" sortBy="#{m.name}"><h:outputText value="#{m.name}"/></p:column>
+                    <p:column headerText="Країна" sortBy="#{m.country}"><h:outputText value="#{m.country}"/></p:column>
+                    <p:column headerText="Заснована" sortBy="#{m.foundedYear}"><h:outputText value="#{m.foundedYear}"/></p:column>
+                    <p:column headerText="Опис"><h:outputText value="#{m.description}"/></p:column>
+                    <p:column headerText="Дії" width="130">
+                        <p:commandButton icon="pi pi-pencil" styleClass="ui-button-secondary" style="margin-right:5px"
+                                         action="#{manufacturerBean.selectForUpdate(m)}"
+                                         update="form-update-mf, growl"
+                                         oncomplete="PF('dlgUpdateMf').show()"/>
+                        <p:commandButton icon="pi pi-trash" styleClass="ui-button-danger"
+                                         action="#{manufacturerBean.delete(m.id)}"
+                                         update="form-manufacturers, form-create-car, form-update-car, growl">
+                            <p:confirm header="Видалення" icon="pi pi-exclamation-triangle"
+                                       message="Видалити цього виробника?"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </div>
+    </h:body>
+</f:view>
+</html>
